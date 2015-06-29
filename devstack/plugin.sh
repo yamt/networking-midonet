@@ -36,6 +36,14 @@ if [[ "$1" == "stack" ]]; then
 
     elif [[ "$2" == "install" ]]; then
 
+        # Build neutron midonet plugin
+        pip_install --no-deps --editable $ABSOLUTE_PATH/..
+
+        # Build midonet client
+        pip_install --editable $MIDONET_DIR/python-midonetclient
+
+    elif [[ "$2" == "extra" ]]; then
+
         export SERVICE_HOST=${MIDONET_SERVICE_HOST:?Error \$MIDONET_SERVICE_HOST is not set}
         export API_PORT=$MIDONET_API_PORT
         export CLUSTER_API_PORT=$MIDONET_CLUSTER_API_PORT
@@ -51,16 +59,8 @@ if [[ "$1" == "stack" ]]; then
         export MIDO_DB_PASSWORD=$DATABASE_PASSWORD
         export CONFIGURE_LOGGING
 
-        # Build neutron midonet plugin
-        pip_install --no-deps --editable $ABSOLUTE_PATH/..
-
-        # Build midonet client
-        pip_install --editable $MIDONET_DIR/python-midonetclient
-
         # Run the command
         $MIDONET_DIR/tools/devmido/mido.sh
-
-    elif [[ "$2" == "extra" ]]; then
 
         if [ "$MIDONET_CREATE_FAKE_UPLINK" == "True" ]; then
             if [[ "$MIDONET_USE_ZOOM" == "True" ]]; then
