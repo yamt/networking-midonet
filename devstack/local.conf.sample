@@ -56,3 +56,10 @@ NOVA_VNC_ENABLED=True
 # If you want to use the new V2 architecture of MidoNet, uncomment these:
 #
 # MIDONET_USE_ZOOM=True
+
+# If you want to use the embedded metadata proxy, uncomment these:
+#
+# MIDONET_USE_METADATA=True
+# MIDONET_USE_ZOOM=True
+# disable_service q-dhcp
+# disable_service q-meta
