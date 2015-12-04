@@ -13,13 +13,6 @@
 #    under the License.
 
 from oslo_config import cfg
-import six
-import unittest2
-
-# We don't need to run these test under Python 3 yet.
-# TODO(HenryG): Figure out why they don't work with Python 3.
-if six.PY3:
-    raise unittest2.SkipTest("Disabled for Python 3.")
 
 from neutron.db.migration.alembic_migrations import external
 from neutron.db.migration import cli as migration
@@ -29,9 +22,33 @@ from neutron.tests.functional.db import test_migrations
 #from midonet.neutron.db.migration import alembic_migrations
 from midonet.neutron.db.migration.models import head
 
+# List of *aaS tables to exclude
+# REVISIT(yamamoto): These *aaS repos should provide the lists by themselves,
+# similarly to Neutron's external.TABLES.
+
+LBAAS_TABLES = {
+    'alembic_version_lbaas',
+
+    # bug 1522706
+    'lbaas_listeners',
+    'lbaas_sni',
+
+    # NOTE(yamamoto): We don't import these models
+    'nsxv_edge_monitor_mappings',
+    'nsxv_edge_pool_mappings',
+    'nsxv_edge_vip_mappings',
+}
+
+FWAAS_TABLES = {
+    'alembic_version_fwaas',
+
+    # NOTE(yamamoto): We don't import these models
+    'cisco_firewall_associations',
+}
+
 # EXTERNAL_TABLES should contain all names of tables that are not related to
 # current repo.
-EXTERNAL_TABLES = set(external.TABLES)
+EXTERNAL_TABLES = set(external.TABLES) | LBAAS_TABLES | FWAAS_TABLES
 VERSION_TABLE = 'alembic_version_midonet'
 
 
@@ -52,8 +69,9 @@ class _TestModelsMigrationsMidonet(test_migrations._TestModelsMigrations):
                                  name == VERSION_TABLE or
                                  name in EXTERNAL_TABLES):
             return False
-        else:
-            return True
+        if type_ == 'index' and reflected and name.startswith("idx_autoinc_"):
+            return False
+        return True
 
 
 class TestModelsMigrationsMysql(_TestModelsMigrationsMidonet,
