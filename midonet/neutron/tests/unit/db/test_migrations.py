@@ -65,7 +65,8 @@ class _TestModelsMigrationsMidonet(test_migrations._TestModelsMigrations):
     def compare_type(self, ctxt, insp_col, meta_col, insp_type, meta_type):
         # NOTE(yamamoto): A workaround for midonet_tasks.data,
         # LONGTEXT() vs Text(length=16777216)
-        if (isinstance(insp_type, mysql.LONGTEXT) and
+        if (self.get_engine().dialect.name == 'mysql' and
+            isinstance(insp_type, mysql.LONGTEXT) and
             isinstance(meta_type, types.Text)):
             return False
         return super(_TestModelsMigrationsMidonet, self).compare_type(
@@ -83,4 +84,9 @@ class _TestModelsMigrationsMidonet(test_migrations._TestModelsMigrations):
 
 class TestModelsMigrationsMysql(_TestModelsMigrationsMidonet,
                                 base.MySQLTestCase):
+    pass
+
+
+class TestModelsMigrationsPostgresql(_TestModelsMigrationsMidonet,
+                                     base.PostgreSQLTestCase):
     pass
