@@ -44,3 +44,8 @@ function is_neutron_ovs_base_plugin {
 function neutron_plugin_configure_debug_command {
     :
 }
+
+function neutron_plugin_install_agent_packages {
+    :
+}
+
