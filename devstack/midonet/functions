@@ -23,14 +23,6 @@ function neutron_plugin_configure_common {
        /${Q_PLUGIN_CONF_PATH}/${Q_PLUGIN_CONF_FILENAME}
 }
 
-function neutron_plugin_configure_dhcp_agent {
-    DHCP_DRIVER=${DHCP_DRIVER:-"midonet.neutron.agent.midonet_driver.DhcpNoOpDriver"}
-    neutron_plugin_setup_interface_driver $Q_DHCP_CONF_FILE
-    iniset $Q_DHCP_CONF_FILE DEFAULT dhcp_driver $DHCP_DRIVER
-    iniset $Q_DHCP_CONF_FILE DEFAULT use_namespaces True
-    iniset $Q_DHCP_CONF_FILE DEFAULT enable_isolated_metadata True
-}
-
 function neutron_plugin_configure_l3_agent {
     die $LINENO "q-l3 must not be executed with MidoNet plugin!"
 }
