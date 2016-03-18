@@ -44,12 +44,13 @@ if [[ "$1" == "stack" ]]; then
     elif [[ "$2" == "install" ]]; then
 
         # Build neutron midonet plugin
-        pip_install --no-deps --editable $PLUGIN_PATH
-        # Ensure that we can do "tox -e genconfig" in the later phase
-        safe_chown -R $STACK_USER $PLUGIN_PATH/*.egg-info
+        setup_develop $PLUGIN_PATH
 
+        # NOTE(yamamoto): A workaround: devstack setup_package function
+        # is assuming the existance of *.egg-info.
+        touch $MIDONET_DIR/python-midonetclient/dummy.egg-info
         # Build midonet client
-        pip_install --editable $MIDONET_DIR/python-midonetclient
+        setup_develop $MIDONET_DIR/python-midonetclient
 
     elif [[ "$2" == "extra" ]]; then
 
