@@ -177,3 +177,23 @@ class MidonetApiClient(base.MidonetClientBase):
 
     def delete_l2_gateway_connection(self, context, l2_gw_conn_id):
         self.api_cli.delete_l2gw_conn(l2_gw_conn_id)
+
+    # Tap as a service
+
+    def create_tap_flow(self, context, tap_flow):
+        self.api_cli.create_tap_flow(tap_flow)
+
+    def update_tap_flow(self, context, tap_flow):
+        self.api_cli.update_tap_flow(tap_flow)
+
+    def delete_tap_flow(self, context, tap_flow_id):
+        self.api_cli.delete_tap_flow(tap_flow_id)
+
+    def create_tap_service(self, context, tap_service):
+        self.api_cli.create_tap_service(tap_service)
+
+    def update_tap_service(self, context, tap_service):
+        self.api_cli.update_tap_service(tap_service)
+
+    def delete_tap_service(self, context, tap_service_id):
+        self.api_cli.delete_tap_service(tap_service_id)
