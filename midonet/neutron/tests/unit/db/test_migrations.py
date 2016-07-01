@@ -16,8 +16,8 @@ from oslo_config import cfg
 
 from neutron.db.migration.alembic_migrations import external
 from neutron.db.migration import cli as migration
-from neutron.tests.common import base
 from neutron.tests.functional.db import test_migrations
+from neutron.tests.unit import testlib_api
 
 from midonet.neutron.db.migration.models import head
 
@@ -91,10 +91,10 @@ class _TestModelsMigrationsMidonet(test_migrations._TestModelsMigrations):
 
 
 class TestModelsMigrationsMysql(_TestModelsMigrationsMidonet,
-                                base.MySQLTestCase):
+                                testlib_api.MySQLTestCaseMixin):
     pass
 
 
 class TestModelsMigrationsPostgresql(_TestModelsMigrationsMidonet,
-                                     base.PostgreSQLTestCase):
+                                     testlib_api.PostgreSQLTestCaseMixin):
     pass
