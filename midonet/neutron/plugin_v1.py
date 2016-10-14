@@ -106,7 +106,8 @@ class MidonetMixin(plugin.MidonetMixinBase,
         self.client.update_network_postcommit(id, net)
 
         LOG.debug("MidonetMixin.update_network exiting: net=%r", net)
-        return net
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_network(context, id)
 
     def delete_network(self, context, id):
         LOG.debug("MidonetMixin.delete_network called: id=%r", id)
@@ -171,7 +172,8 @@ class MidonetMixin(plugin.MidonetMixinBase,
         self.client.update_subnet_postcommit(id, s)
 
         LOG.debug("MidonetMixin.update_subnet exiting: subnet=%r", s)
-        return s
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_subnet(context, id)
 
     def create_port(self, context, port):
         LOG.debug("MidonetMixin.create_port called: port=%r", port)
@@ -305,7 +307,8 @@ class MidonetMixin(plugin.MidonetMixinBase,
                     LOG.exception(_LE("Failed to update port status %s"), id)
 
         LOG.debug("MidonetMixin.update_port exiting: p=%r", p)
-        return p
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_port(context, id)
 
     def create_router(self, context, router):
         LOG.debug("MidonetMixin.create_router called: router=%(router)s",

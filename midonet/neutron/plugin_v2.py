@@ -164,7 +164,8 @@ class MidonetPluginV2(plugin.MidonetMixinBase,
         self.client.update_network_postcommit(id, net)
 
         LOG.debug("MidonetPluginV2.update_network exiting: net=%r", net)
-        return net
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_network(context, id)
 
     def delete_network(self, context, id):
         LOG.debug("MidonetPluginV2.delete_network called: id=%r", id)
@@ -230,7 +231,8 @@ class MidonetPluginV2(plugin.MidonetMixinBase,
         self.client.update_subnet_postcommit(id, s)
 
         LOG.debug("MidonetPluginV2.update_subnet exiting: subnet=%r", s)
-        return s
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_subnet(context, id)
 
     def create_port(self, context, port):
         LOG.debug("MidonetPluginV2.create_port called: port=%r", port)
@@ -405,7 +407,8 @@ class MidonetPluginV2(plugin.MidonetMixinBase,
                     LOG.exception(_LE("Failed to update port status %s"), id)
 
         LOG.debug("MidonetPluginV2.update_port exiting: p=%r", p)
-        return p
+        # REVISIT(yamamoto): Retrieve the db object to get the correct revision
+        return self.get_port(context, id)
 
     def create_security_group(self, context, security_group, default_sg=False):
         LOG.debug("MidonetPluginV2.create_security_group called: "
