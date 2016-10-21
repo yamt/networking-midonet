@@ -111,6 +111,20 @@ NOTE: No need to configure `Firewall Driver` at all.  It's irrelevant
 because this plugin does not use Neutron L3 agent.
 
 
+LBaaS v2
+--------
+
+MidoNet plugin provides LBaaS v2 service driver.  To configure it,
+add the following entries in the Neutron configuration file
+``/etc/neutron/neutron.conf``::
+
+    [DEFAULT]
+    service_plugins = lbaasv2
+
+    [service_providers]
+    service_provider=LOADBALANCERV2:Midonet:midonet.neutron.services.loadbalancer.v2_driver.MidonetLoadBalancerDriver:default
+
+
 VPNaaS
 ------
 
