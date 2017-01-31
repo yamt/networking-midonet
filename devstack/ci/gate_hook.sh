@@ -153,7 +153,6 @@ export DEVSTACK_LOCAL_CONFIG+=$'\n'"NEUTRON_VPNAAS_SERVICE_PROVIDER=\"VPN:Midone
 export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin neutron https://github.com/openstack/neutron"
 s+=",q-qos"
 s+=",-q-trunk"  # bug 1643451
-load_conf_hook qos
 
 # Enable LBaaSv2
 export DEVSTACK_LOCAL_CONFIG+=$'\n'"enable_plugin neutron-lbaas https://git.openstack.org/openstack/neutron-lbaas"
