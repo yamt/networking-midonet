@@ -12,7 +12,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from alembic import script as alembic_script
 from oslo_config import cfg
+import six
 
 from neutron.db.migration.alembic_migrations import external
 from neutron.db.migration import cli as migration
@@ -129,4 +131,34 @@ class TestModelsMigrationsMysql(testlib_api.MySQLTestCaseMixin,
 class TestModelsMigrationsPostgresql(testlib_api.PostgreSQLTestCaseMixin,
                                      _TestModelsMigrationsMidonet,
                                      testlib_api.SqlTestCaseLight):
+    pass
+
+
+class _TestWalkMigrations(test_migrations._TestWalkMigrations):
+
+    def _get_alembic_config(self, uri):
+        our_config = None
+        for config in migration.get_alembic_configs():
+            config.neutron_config = cfg.CONF
+            config.neutron_config.set_override('connection',
+                                               six.text_type(uri),
+                                               group='database')
+            project = config.get_main_option('neutron_project')
+            if project == 'networking-midonet':
+                our_config = config
+        self.assertIsNotNone(our_config)
+        self.script_dir = alembic_script.ScriptDirectory.from_config(
+            our_config)
+        return our_config
+
+
+class TestWalkMigrationsMysql(testlib_api.MySQLTestCaseMixin,
+                              _TestWalkMigrations,
+                              testlib_api.SqlTestCaseLight):
+    pass
+
+
+class TestWalkMigrationsPsql(testlib_api.PostgreSQLTestCaseMixin,
+                             _TestWalkMigrations,
+                             testlib_api.SqlTestCaseLight):
     pass

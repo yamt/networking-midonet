@@ -16,7 +16,7 @@
 from oslo_db.sqlalchemy import utils as db_utils
 from oslo_utils import uuidutils
 
-from neutron.tests.functional.db import test_migrations
+from midonet.neutron.tests.unit.db import test_migrations
 
 
 class RemoveV2Mixin(object):
@@ -54,7 +54,6 @@ class RemoveV2Mixin(object):
                     host=host, interface_name=inteface_name)
 
     def _pre_upgrade_3d581a53980d(self, engine):
-        self.assertTrue(False)
         data = {
             "uplink": self._create_topology(engine, network_type="uplink"),
             "midonet": self._create_topology(engine, network_type="midonet"),
@@ -62,7 +61,6 @@ class RemoveV2Mixin(object):
         return data
 
     def _check_3d581a53980d(self, engine, data):
-        self.assertTrue(False)
         networks = db_utils.get_table(engine, 'networks')
         ports = db_utils.get_table(engine, 'ports')
         portbindingports = db_utils.get_table(engine, 'portbindingports')
