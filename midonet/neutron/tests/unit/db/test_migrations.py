@@ -151,6 +151,11 @@ class _TestWalkMigrations(test_migrations._TestWalkMigrations):
             our_config)
         return our_config
 
+    def test_walk_versions(self):
+        config = self._get_alembic_config(self.engine.url)
+        migration.do_alembic_command(config, 'upgrade', 'kilo')
+        super(_TestWalkMigrations, self).test_walk_versions()
+
 
 class TestWalkMigrationsMysql(testlib_api.MySQLTestCaseMixin,
                               _TestWalkMigrations,
