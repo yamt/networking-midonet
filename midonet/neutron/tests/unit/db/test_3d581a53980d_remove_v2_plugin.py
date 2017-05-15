@@ -20,7 +20,7 @@ from neutron.tests.functional.db import test_migrations
 
 
 class RemoveV2Mixin(object):
-    def _create_topology(self, engine, network_type)
+    def _create_topology(self, engine, network_type):
         networks = db_utils.get_table(engine, 'networks')
         ports = db_utils.get_table(engine, 'ports')
         portbindingports = db_utils.get_table(engine, 'portbindingports')
