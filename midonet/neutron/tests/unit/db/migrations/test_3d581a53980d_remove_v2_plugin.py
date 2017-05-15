@@ -81,7 +81,7 @@ class RemoveV2Mixin(object):
             portbindingports,
         ):
             rows = engine.execute(table.select()).fetchall()
-            self.assertEquals([], rows)
+            self.assertEqual([], rows)
 
 
 class TestRemoveV2Mysql(RemoveV2Mixin,
