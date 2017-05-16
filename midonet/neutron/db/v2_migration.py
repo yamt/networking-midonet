@@ -1,4 +1,6 @@
 
+from oslo_log import helpers as log_helpers
+from oslo_log import log as logging
 from oslo_utils import uuidutils
 
 from neutron_lib import context as ctx
@@ -30,6 +32,10 @@ from midonet.neutron.db import provider_network_db
 #    networksegments (neutron.db.models.segment.NetworkSegment)
 
 
+LOG = logging.getLogger(__name__)
+
+
+@log_helpers.log_method_call
 def add_segment(context, network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
@@ -44,6 +50,7 @@ def add_segment(context, network_id, network_type):
     netseg_obj.create()
 
 
+@log_helpers.log_method_call
 def add_binding_bound(context, port_id, segment_id, host, interface_name):
     context.session.add(ml2_models.PortBindingLevel(
         host=host,
@@ -62,6 +69,7 @@ def add_binding_bound(context, port_id, segment_id, host, interface_name):
         status='ACTIVE'))
 
 
+@log_helpers.log_method_call
 def add_binding_unbound(context, port_id):
     # ml2 add_port_binding equiv
     context.session.add(ml2_models.PortBinding(
@@ -103,7 +111,7 @@ def migrate():
         port_interface = {}
         for binding in old_interface_bindings:
             port_interface[binding.port_id] = binding.interace_name
-        for port in context.session.query(models_v2.Port).all()
+        for port in context.session.query(models_v2.Port).all():
             port_id = port.id
             if port_id in port_host:
                 add_binding_bound(context, port_id, segments[port.network_id],
