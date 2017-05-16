@@ -141,6 +141,6 @@ def migrate():
             portbinding.PortBindingPort,
             port_binding_db.PortBindingInfo,
         ):
-            session.query(table).delete()
+            context.session.query(table).delete()
 
         raise Exception("rollback")
