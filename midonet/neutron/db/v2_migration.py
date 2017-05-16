@@ -44,6 +44,31 @@ def add_segment(context, network_id, network_type):
     netseg_obj.create()
 
 
+def add_binding_bound(context, port_id, segment_id, host, inteface_name):
+    context.session.add(ml2_models.PortBindingLevel(
+        host=host,
+        level=0,
+        driver='midonet',
+        segment_id=segment_id))
+    context.session.add(ml2_models.PortBinding(
+        port_id=port_id,
+        vif_type='midonet',
+        vnic_type='normal',
+        profile={'interface_name': interface_name},
+        vif_details={'port_filter': True},
+        status='ACTIVE'))
+
+
+def add_binding_unbound(context, port_id):
+    context.session.add(ml2_models.PortBinding(
+        port_id=port_id,
+        vif_type='unbound',
+        vnic_type='normal',
+        profile='',
+        vif_details='',
+        status='ACTIVE'))
+
+
 def migrate():
     # Migrate db tables from v2 to ML2
     context = ctx.get_admin_context()
@@ -52,13 +77,36 @@ def migrate():
         # TODO(yamamoto): migrate port port binding
         # TODO(yamamoto): add a sanity check to ensure ml2 tables are empty
         # before migration
+        segments = {}
         old_segments = context.session.query(
             provider_network_db.NetworkBinding).all()
         uplink_network_ids = [seg.network_id for seg in old_segments]
         for network_id in uplink_network_ids:
-            add_segment(context, network_id=network_id, network_type="uplink")
+            segments[network_id] = add_segment(context,
+                network_id=network_id, network_type="uplink")
         networks = context.session.query(models_v2.Network).all()
         for net in networks:
             if net.id not in uplink_network_ids:
-                add_segment(context, network_id=net.id, network_type="midonet")
-        #context.session.delete(old_segments)
+                segments[network_id] = add_segment(context,
+                    network_id=net.id, network_type="midonet")
+
+        old_host_bindings = context.session.query(
+            portbindings_db.PortBindingPort).all()
+        old_interface_bindings = context.session.query(
+            port_binding_db.PortBindingInfo).all()
+
+        port_host = {}
+        for binding in old_host_bindings:
+            port_host[binding.port_id] = binding.host
+        port_interface = {}
+        for binding in old_interface_bindings:
+            port_interface[binding.port_id] = binding.interace_name
+        for port_id in port_host.keys():
+            if port_id in port_interface:
+                port = context.session.query(
+                    models_v2.Ports).filter(id=port_id)
+                add_binding_bound(context, port_id, segments[port.network_id],
+                    port_host[port_id], port_interface[port_id])
+            else:
+                add_binding_unbound(context, port_id)
+        # context.session.delete(old_segments)
