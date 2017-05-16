@@ -53,7 +53,7 @@ def migrate():
         # before migration
         old_segments = context.session.query(
             provider_network_db.NetworkBinding).all()
-        uplink_network_ids = [seg.network_id in old_segments]
+        uplink_network_ids = [seg.network_id for seg in old_segments]
         for network_id in uplink_network_ids:
             add_segment(network_id=network_id, network_type="uplink")
         networks = context.session.query(models_v2.Network).all()
