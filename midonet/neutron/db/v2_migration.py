@@ -18,6 +18,7 @@ import functools
 from oslo_log import log as logging
 from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
+from sqlalchemy import sql
 
 from neutron_lib import context as ctx
 
@@ -62,6 +63,16 @@ def log_calls(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+
+def check_alembic_versions(context):
+    sql.compile(sql.select([sql.table('alembic_version')])
+    for version in context.session.execute(stmt).fetchall():
+        if version not in _KNOWN_VERSIONS:
+            LOG.error('Unknown version %(version)s', {
+                'version': version,
+            })
+            raise SystemExit(1)
 
 
 @log_calls
@@ -144,6 +155,7 @@ def migrate():
             raise SystemExit(1)
 
         LOG.info("Moving data from v2 plugin tables to ML2 tables")
+        check_alembic_versions(context)
 
         # Migrate network segments
         # NOTE(yamamoto): Only "uplink" networks have a NetworkBinding row.
