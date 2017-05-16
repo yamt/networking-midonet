@@ -1,4 +1,5 @@
 
+import functools
 
 from oslo_log import log as logging
 from oslo_utils import uuidutils
@@ -35,6 +36,20 @@ from midonet.neutron.db import provider_network_db
 LOG = logging.getLogger(__name__)
 
 
+def log_calls(func):
+    @functools.wraps(func):
+    def wrapper(*args, **kwargs):
+        LOG.info('Calling %(func)s with %(args)s %(kwargs)', {
+            'func': func.__name__,
+            'args': args,
+            'kwargs': kwargs,
+        })
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+@log_calls
 def add_segment(context, network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
@@ -49,6 +64,7 @@ def add_segment(context, network_id, network_type):
     netseg_obj.create()
 
 
+@log_calls
 def add_binding_bound(context, port_id, segment_id, host, interface_name):
     context.session.add(ml2_models.PortBindingLevel(
         host=host,
@@ -67,6 +83,7 @@ def add_binding_bound(context, port_id, segment_id, host, interface_name):
         status='ACTIVE'))
 
 
+@log_calls
 def add_binding_unbound(context, port_id):
     # ml2 add_port_binding equiv
     context.session.add(ml2_models.PortBinding(
@@ -78,6 +95,7 @@ def add_binding_unbound(context, port_id):
         status='ACTIVE'))
 
 
+@log_calls
 def migrate():
     # Migrate db tables from v2 to ML2
     context = ctx.get_admin_context()
