@@ -61,4 +61,4 @@ def migrate():
         for net in networks:
             if net.id not in uplink_network_ids:
                 add_segment(context, network_id=net.id, network_type="midonet")
-        context.session.delete(old_segments)
+        #context.session.delete(old_segments)
