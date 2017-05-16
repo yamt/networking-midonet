@@ -95,6 +95,7 @@ def add_binding_bound(context, port_id, segment_id, host, interface_name):
         profile['interface_name'] = interface_name
     context.session.add(ml2_models.PortBinding(
         port_id=port_id,
+        host=host,
         vif_type='midonet',
         vnic_type='normal',
         profile=jsonutils.dumps(profile),
