@@ -25,7 +25,6 @@ from neutron.db import api as db_api
 from neutron.db.models import portbinding
 from neutron.db.models import segment
 from neutron.db import models_v2
-from neutron.db import segments_db
 from neutron.objects import network as network_obj
 from neutron.plugins.ml2 import models as ml2_models
 
@@ -147,6 +146,9 @@ def migrate():
         LOG.info("Moving data from v2 plugin tables to ML2 tables")
 
         # Migrate network segments
+        # NOTE(yamamoto): Only "uplink" networks have a NetworkBinding row.
+        # A network without NetworkBinding row is of the default "midonet"
+        # type.
         segments = {}
         uplink_network_ids = [seg.network_id for seg in old_segments]
         for network_id in uplink_network_ids:
@@ -155,10 +157,12 @@ def migrate():
         networks = context.session.query(models_v2.Network).all()
         for net in networks:
             if net.id not in uplink_network_ids:
-                segments[network_id] = add_segment(context,
+                segments[net.id] = add_segment(context,
                     network_id=net.id, network_type="midonet")
 
         # Migrate port bindings
+        # NOTE(yamamoto): Unlike midonet v2, ML2 has PortBinding rows
+        # even for unbound ports.
         port_host = {}
         for binding in old_host_bindings:
             port_host[binding.port_id] = binding.host
