@@ -100,14 +100,20 @@ def add_binding_unbound(context, port_id):
 @log_calls
 def migrate():
     # Migrate db tables from v2 to ML2
+    # NOTE(yamamoto): This would bump revisions of affected resources.
+
     context = ctx.get_admin_context()
     with db_api.context_manager.writer.using(context):
-        # TODO(yamamoto): locking
+        # Lock all old rows for the case of multiple neutron servers.
+        old_segments = context.session.query(
+            provider_network_db.NetworkBinding).with_for_update().all()
+        old_host_bindings = context.session.query(
+            portbinding.PortBindingPort).with_for_update().all()
+        old_interface_bindings = context.session.query(
+            port_binding_db.PortBindingInfo).with_for_update().all()
 
         # Migrate network segments
         segments = {}
-        old_segments = context.session.query(
-            provider_network_db.NetworkBinding).all()
         uplink_network_ids = [seg.network_id for seg in old_segments]
         for network_id in uplink_network_ids:
             segments[network_id] = add_segment(context,
@@ -119,10 +125,6 @@ def migrate():
                     network_id=net.id, network_type="midonet")
 
         # Migrate port bindings
-        old_host_bindings = context.session.query(
-            portbinding.PortBindingPort).all()
-        old_interface_bindings = context.session.query(
-            port_binding_db.PortBindingInfo).all()
         port_host = {}
         for binding in old_host_bindings:
             port_host[binding.port_id] = binding.host
