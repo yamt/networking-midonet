@@ -58,7 +58,7 @@ def migrate():
         for network_id in uplink_network_ids:
             add_segment(network_id=network_id, network_type="uplink")
         networks = context.session.query(models_v2.Network).all()
-        if net in networks:
+        for net in networks:
             if net.id not in uplink_network_ids:
                 add_segment(network_id=net.id, network_type="midonet")
         context.session.delete(old_segments)
