@@ -1,5 +1,5 @@
 
-from oslo_log import helpers as log_helpers
+
 from oslo_log import log as logging
 from oslo_utils import uuidutils
 
@@ -35,7 +35,6 @@ from midonet.neutron.db import provider_network_db
 LOG = logging.getLogger(__name__)
 
 
-@log_helpers.log_method_call
 def add_segment(context, network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
@@ -50,7 +49,6 @@ def add_segment(context, network_id, network_type):
     netseg_obj.create()
 
 
-@log_helpers.log_method_call
 def add_binding_bound(context, port_id, segment_id, host, interface_name):
     context.session.add(ml2_models.PortBindingLevel(
         host=host,
@@ -69,7 +67,6 @@ def add_binding_bound(context, port_id, segment_id, host, interface_name):
         status='ACTIVE'))
 
 
-@log_helpers.log_method_call
 def add_binding_unbound(context, port_id):
     # ml2 add_port_binding equiv
     context.session.add(ml2_models.PortBinding(
@@ -86,8 +83,8 @@ def migrate():
     context = ctx.get_admin_context()
     with db_api.context_manager.writer.using(context):
         # TODO(yamamoto): locking
-        # TODO(yamamoto): add a sanity check to ensure ml2 tables are empty
-        # before migration
+
+        # Migrate network segments
         segments = {}
         old_segments = context.session.query(
             provider_network_db.NetworkBinding).all()
@@ -101,6 +98,7 @@ def migrate():
                 segments[network_id] = add_segment(context,
                     network_id=net.id, network_type="midonet")
 
+        # Migrate port bindings
         old_host_bindings = context.session.query(
             portbinding.PortBindingPort).all()
         old_interface_bindings = context.session.query(
@@ -119,5 +117,9 @@ def migrate():
             else:
                 add_binding_unbound(context, port_id)
 
+        # Delete no longer used rows
+        context.session.delete(provider_network_db.NetworkBinding)
+        context.session.delete(portbinding.PortBindingPort)
+        context.session.delete(port_binding_db.PortBindingInfo)
+
         raise Exception("rollback")
-        # context.session.delete(old_segments)
