@@ -33,17 +33,24 @@ def add_segment(network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
     netseg_obj = network_obj.NetworkSegment(
-        context, id=uuidutils.generate_uuid(), network_id=network_id,
+        context, id=uuidutils.generate_uuid(),
+        network_id=network_id,
         network_type=network_type,
         physical_network=None,
         segmentation_id=None,
-        segment_index=segment_index, is_dynamic=False)
+        segment_index=0,
+        is_dynamic=False)
     netseg_obj.create()
 
 
 def migrate():
+    # Migrate db tables from v2 to ML2
     context = ctx.get_admin_context()
     with db_api.context_manager.writer.using(context):
+        # TODO(yamamoto): locking
+        # TODO(yamamoto): migrate port port binding
+        # TODO(yamamoto): add a sanity check to ensure ml2 tables are empty
+        # before migration
         old_segments = context.session.query(
             provider_network_db.NetworkBinding).all()
         uplink_network_ids = [seg.network_id in old_segments]
