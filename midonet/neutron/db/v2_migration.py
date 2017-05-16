@@ -110,7 +110,7 @@ def migrate():
             port_host[binding.port_id] = binding.host
         port_interface = {}
         for binding in old_interface_bindings:
-            port_interface[binding.port_id] = binding.interace_name
+            port_interface[binding.port_id] = binding.interface_name
         for port in context.session.query(models_v2.Port).all():
             port_id = port.id
             if port_id in port_host:
