@@ -138,11 +138,8 @@ def migrate():
                 add_binding_unbound(context, port_id)
 
         # Delete no longer used rows
-        for table in (
-            provider_network_db.NetworkBinding,
-            portbinding.PortBindingPort,
-            port_binding_db.PortBindingInfo,
-        ):
-            context.session.query(table).delete()
+        map(context.session.delete, old_segments)
+        map(context.session.delete, old_host_bindings)
+        map(context.session.delete, old_interface_bindings)
 
         raise Exception("rollback")
