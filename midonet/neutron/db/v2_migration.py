@@ -54,7 +54,7 @@ LOG = logging.getLogger(__name__)
 
 _KNOWN_VERSIONS = [
     '804a3c76314c',
-#    '5c85685d616d',
+    '5c85685d616d',
 ]
 
 
@@ -74,7 +74,6 @@ def log_calls(func):
 def check_alembic_versions(context):
     stmt = sql.select(
         [sql.column('version_num')]).select_from(sql.table('alembic_version'))
-    #LOG.info("stmt %s", str(stmt.compile()))
     for row in context.session.execute(stmt).fetchall():
         version = row[0]
         if version not in _KNOWN_VERSIONS:
