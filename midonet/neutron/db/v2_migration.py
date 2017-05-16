@@ -68,6 +68,7 @@ def add_segment(context, network_id, network_type):
 @log_calls
 def add_binding_bound(context, port_id, segment_id, host, interface_name):
     context.session.add(ml2_models.PortBindingLevel(
+        port_id=port_id,
         host=host,
         level=0,
         driver='midonet',
