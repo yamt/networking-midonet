@@ -52,6 +52,11 @@ from midonet.neutron.db import provider_network_db
 LOG = logging.getLogger(__name__)
 
 
+_KNOWN_VERSIONS = [
+    '5c85685d616d',
+]
+
+
 def log_calls(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
