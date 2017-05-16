@@ -39,7 +39,7 @@ LOG = logging.getLogger(__name__)
 def log_calls(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        LOG.info('Calling %(func)s with %(args)s %(kwargs)', {
+        LOG.info('Calling %(func)s with %(args)s %(kwargs)s', {
             'func': func.__name__,
             'args': args,
             'kwargs': kwargs,
