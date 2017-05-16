@@ -10,8 +10,8 @@ from neutron.db import segments_db
 from neutron.objects import network as network_obj
 from neutron.plugins.ml2 import models as ml2_models
 
-from midonet.neutron.db import provider_network_db
 from midonet.neutron.db import port_binding_db
+from midonet.neutron.db import provider_network_db
 
 
 # midonet v2 port binding:
@@ -30,7 +30,7 @@ from midonet.neutron.db import port_binding_db
 #    networksegments (neutron.db.models.segment.NetworkSegment)
 
 
-def add_segment(network_id, network_type):
+def add_segment(context, network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
     netseg_obj = network_obj.NetworkSegment(
@@ -56,9 +56,9 @@ def migrate():
             provider_network_db.NetworkBinding).all()
         uplink_network_ids = [seg.network_id for seg in old_segments]
         for network_id in uplink_network_ids:
-            add_segment(network_id=network_id, network_type="uplink")
+            add_segment(context, network_id=network_id, network_type="uplink")
         networks = context.session.query(models_v2.Network).all()
         for net in networks:
             if net.id not in uplink_network_ids:
-                add_segment(network_id=net.id, network_type="midonet")
+                add_segment(context, network_id=net.id, network_type="midonet")
         context.session.delete(old_segments)
