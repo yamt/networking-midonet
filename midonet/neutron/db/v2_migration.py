@@ -2,6 +2,7 @@
 import functools
 
 from oslo_log import log as logging
+from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
 
 from neutron_lib import context as ctx
@@ -78,8 +79,8 @@ def add_binding_bound(context, port_id, segment_id, host, interface_name):
         port_id=port_id,
         vif_type='midonet',
         vnic_type='normal',
-        profile=profile,
-        vif_details={'port_filter': True},
+        profile=jsonutils.dumps(profile),
+        vif_details=jsonutils.dumps({'port_filter': True}),
         status='ACTIVE'))
 
 
