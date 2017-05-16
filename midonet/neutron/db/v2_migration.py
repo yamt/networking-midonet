@@ -71,7 +71,7 @@ def log_calls(func):
 
 
 def check_alembic_versions(context):
-    sql.compile(sql.select([sql.table('alembic_version')])
+    stmt = sql.select([sql.table('alembic_version')])
     for version in context.session.execute(stmt).fetchall():
         if version not in _KNOWN_VERSIONS:
             LOG.error('Unknown version %(version)s', {
