@@ -23,6 +23,7 @@ from neutron_lib import context as ctx
 
 from neutron.db import api as db_api
 from neutron.db.models import portbinding
+from neutron.db.models import segment
 from neutron.db import models_v2
 from neutron.db import segments_db
 from neutron.objects import network as network_obj
@@ -129,6 +130,21 @@ def migrate():
             portbinding.PortBindingPort).with_for_update().all()
         old_interface_bindings = context.session.query(
             port_binding_db.PortBindingInfo).with_for_update().all()
+
+        if not any([old_segments, old_host_bindings, old_interface_bindings]):
+            LOG.info("Nothing to do; v2 plugin tables are empty")
+            return
+
+        if any([
+            context.session.query(segment.NetworkSegment).count(),
+            context.session.query(ml2_models.PortBinding).count(),
+            context.session.query(ml2_models.PortBindingLevel).count(),
+            context.session.query(ml2_models.DistributedPortBinding).count(),
+        ]):
+            LOG.error("Both of v2 plugin and ML2 tables have some contents")
+            raise SystemExit(1)
+
+        LOG.info("Moving data from v2 plugin tables to ML2 tables")
 
         # Migrate network segments
         segments = {}
