@@ -68,8 +68,10 @@ def log_calls(func):
 def add_segment(context, network_id, network_type):
     # NOTE(yamamoto): The code fragment is a modified copy of segments_db.py.
     # We don't want to make callback notifications.
+    segment_id = uuidutils.generate_uuid()
     netseg_obj = network_obj.NetworkSegment(
-        context, id=uuidutils.generate_uuid(),
+        context,
+        id=segment_id,
         network_id=network_id,
         network_type=network_type,
         physical_network=None,
@@ -77,6 +79,7 @@ def add_segment(context, network_id, network_type):
         segment_index=0,
         is_dynamic=False)
     netseg_obj.create()
+    return segment_id
 
 
 @log_calls
