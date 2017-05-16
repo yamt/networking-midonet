@@ -4,6 +4,7 @@ from oslo_utils import uuidutils
 from neutron_lib import context as ctx
 
 from neutron.db import api as db_api
+from neutron.db import models_v2
 from neutron.db import portbindings_db
 from neutron.db import segments_db
 from neutron.objects import network as network_obj
