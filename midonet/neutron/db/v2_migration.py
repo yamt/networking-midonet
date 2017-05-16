@@ -6,8 +6,8 @@ from oslo_utils import uuidutils
 from neutron_lib import context as ctx
 
 from neutron.db import api as db_api
+from neutron.db.models import portbinding
 from neutron.db import models_v2
-from neutron.db import portbindings_db
 from neutron.db import segments_db
 from neutron.objects import network as network_obj
 from neutron.plugins.ml2 import models as ml2_models
@@ -18,7 +18,7 @@ from midonet.neutron.db import provider_network_db
 
 # midonet v2 port binding:
 #    midonet_port_bindings (port_binding_db.PortBindingInfo)
-#    portbindingports (portbindings_db.PortBindingPort)
+#    portbindingports (portbinding.PortBindingPort)
 
 # ml2 port binding:
 #    ml2_port_bindings (ml2_models.PortBinding)
@@ -102,7 +102,7 @@ def migrate():
                     network_id=net.id, network_type="midonet")
 
         old_host_bindings = context.session.query(
-            portbindings_db.PortBindingPort).all()
+            portbinding.PortBindingPort).all()
         old_interface_bindings = context.session.query(
             port_binding_db.PortBindingInfo).all()
         port_host = {}
