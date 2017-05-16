@@ -110,4 +110,6 @@ def migrate():
                     port_host[port_id], port_interface.get(port_id))
             else:
                 add_binding_unbound(context, port_id)
+
+        raise Exception("rollback")
         # context.session.delete(old_segments)
