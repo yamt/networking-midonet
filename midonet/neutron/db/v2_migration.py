@@ -44,22 +44,26 @@ def add_segment(context, network_id, network_type):
     netseg_obj.create()
 
 
-def add_binding_bound(context, port_id, segment_id, host, inteface_name):
+def add_binding_bound(context, port_id, segment_id, host, interface_name):
     context.session.add(ml2_models.PortBindingLevel(
         host=host,
         level=0,
         driver='midonet',
         segment_id=segment_id))
+    profile = {}
+    if interface_name is not None:
+        profile['interface_name'] = interface_name
     context.session.add(ml2_models.PortBinding(
         port_id=port_id,
         vif_type='midonet',
         vnic_type='normal',
-        profile={'interface_name': interface_name},
+        profile=profile,
         vif_details={'port_filter': True},
         status='ACTIVE'))
 
 
 def add_binding_unbound(context, port_id):
+    # ml2 add_port_binding equiv
     context.session.add(ml2_models.PortBinding(
         port_id=port_id,
         vif_type='unbound',
@@ -74,7 +78,6 @@ def migrate():
     context = ctx.get_admin_context()
     with db_api.context_manager.writer.using(context):
         # TODO(yamamoto): locking
-        # TODO(yamamoto): migrate port port binding
         # TODO(yamamoto): add a sanity check to ensure ml2 tables are empty
         # before migration
         segments = {}
@@ -94,19 +97,17 @@ def migrate():
             portbindings_db.PortBindingPort).all()
         old_interface_bindings = context.session.query(
             port_binding_db.PortBindingInfo).all()
-
         port_host = {}
         for binding in old_host_bindings:
             port_host[binding.port_id] = binding.host
         port_interface = {}
         for binding in old_interface_bindings:
             port_interface[binding.port_id] = binding.interace_name
-        for port_id in port_host.keys():
-            if port_id in port_interface:
-                port = context.session.query(
-                    models_v2.Ports).filter(id=port_id)
+        for port in context.session.query(models_v2.Port).all()
+            port_id = port.id
+            if port_id in port_host:
                 add_binding_bound(context, port_id, segments[port.network_id],
-                    port_host[port_id], port_interface[port_id])
+                    port_host[port_id], port_interface.get(port_id))
             else:
                 add_binding_unbound(context, port_id)
         # context.session.delete(old_segments)
