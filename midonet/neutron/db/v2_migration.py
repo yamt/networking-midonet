@@ -75,7 +75,8 @@ def check_alembic_versions(context):
     stmt = sql.select(
         [sql.column('version_num')]).select_from(sql.table('alembic_version'))
     #LOG.info("stmt %s", str(stmt.compile()))
-    for version in context.session.execute(stmt).fetchall():
+    for row in context.session.execute(stmt).fetchall():
+        version = row[0]
         if version not in _KNOWN_VERSIONS:
             LOG.error('Unknown version %(version)s', {
                 'version': version,
