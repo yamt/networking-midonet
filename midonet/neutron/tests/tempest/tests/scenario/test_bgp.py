@@ -131,7 +131,8 @@ class Bgp(BgpClientMixin, base.BaseTempestTestCase):
             data_utils.rand_name('right-router'),
             admin_state_up=True,
             external_network_id=CONF.network.public_network_id,
-            enable_snat=False)
+            enable_snat=False,
+            project_id=cls.os_admin.network_client.tenant_id)
         network = cls.create_network(network_name='right-network')
         subnet = cls.create_subnet(network,
             cidr=netaddr.IPNetwork('10.10.0.0/24'),
